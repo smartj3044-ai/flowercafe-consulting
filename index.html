@@ -124,9 +124,11 @@
             margin-top: 20px;
         }
         
+        /* 모바일 최적화 수정된 부분 */
         @media (max-width: 480px) {
             .grid-5 { grid-template-columns: repeat(2, 1fr); }
             .grid-3 { grid-template-columns: 1fr; }
+            .grid-2 { grid-template-columns: 1fr; } /* 2열 그리드도 모바일에서 1열로 변경 */
         }
     </style>
 </head>
