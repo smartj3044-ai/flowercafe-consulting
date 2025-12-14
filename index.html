@@ -512,7 +512,7 @@
         </div>
 
         <div class="section">
-            <div class="sec-title"><span class="sec-badge">Step 7</span>일정 및 비용</div>
+            <div class="sec-title"><span class="sec-badge">Step 7</span>일정 및 진행</div>
             <div class="q-group grid-options grid-2">
                 <div>
                     <label class="label">희망 시작일</label>
@@ -521,14 +521,6 @@
                 <div>
                     <label class="label">참여 가능 요일<span>*</span></label>
                     <input type="text" name="availableTime" required placeholder="예: 평일 저녁, 주말">
-                </div>
-            </div>
-            <div class="q-group">
-                <label class="label">컨설팅 비용 안내<span>*</span></label>
-                <div class="grid-options">
-                    <input type="radio" name="costGuide" value="안내원함" class="chk-input" id="cg1"><label for="cg1" class="chk-label">안내 원함</label>
-                    <input type="radio" name="costGuide" value="상담후결정" class="chk-input" id="cg2"><label for="cg2" class="chk-label">상담 후 결정</label>
-                    <input type="radio" name="costGuide" value="원치않음" class="chk-input" id="cg3"><label for="cg3" class="chk-label">원치 않음 (단순문의)</label>
                 </div>
             </div>
         </div>
@@ -579,13 +571,12 @@
 </div>
 
 <script>
-    // ✅ URL 유지 (변경 없음)
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxJK6U1A5qw2vYTn16QJr0tb1dKcbNJz1RK3yEns_4weNodlC3tyqefB0bUASlPlsEPkw/exec';
 
     const form = document.getElementById('consultForm');
     const submitBtn = document.querySelector('.submit-btn');
 
-    // 1. 기타 입력창 토글 로직
+    // 기타 입력창 토글 로직
     const triggers = document.querySelectorAll('.toggle-trigger');
     triggers.forEach(trigger => {
         trigger.addEventListener('change', function() {
@@ -593,7 +584,6 @@
             const targetEl = document.getElementById(targetId);
             const siblings = document.getElementsByName(this.name);
             
-            // 라디오 버튼일 경우 다른거 누르면 숨김
             if (this.type === 'radio') {
                  siblings.forEach(sib => {
                      if (sib !== this && sib.classList.contains('toggle-trigger')) {
@@ -601,7 +591,6 @@
                          if(otherTarget) otherTarget.classList.remove('active');
                      }
                  });
-                 // 일반 라디오 선택 시 기타 입력창 숨김
                  document.querySelectorAll(`input[name="${this.name}"]`).forEach(radio => {
                      radio.addEventListener('change', () => {
                          if (!radio.classList.contains('toggle-trigger')) {
@@ -620,7 +609,7 @@
         });
     });
 
-    // 2. Top 3 체크박스 제한 로직
+    // Top 3 제한 로직
     const top3Checkboxes = document.querySelectorAll('.top3-chk');
     top3Checkboxes.forEach(chk => {
         chk.addEventListener('change', () => {
@@ -640,7 +629,6 @@
         const formData = new FormData(form);
         const data = {};
         
-        // 헬퍼: 라디오/체크박스 값과 기타 입력값 합치기
         function combineValue(optName, otherId) {
             let val = formData.get(optName); 
             if (val === '기타' || val === '있음') {
@@ -660,23 +648,19 @@
             return vals;
         }
 
-        const simpleFields = ['status', 'consultType', 'name', 'phone', 'contactMethod', 'address', 'email', 'age', 'gender', 'currentJob', 'targetDate', 'expFlower', 'workTime', 'fundAvailable', 'fundTotal', 'hopeLocation', 'storeSize', 'rentBudget', 'startDate', 'availableTime', 'costGuide', 'worry', 'requests', 'refLinks', 'privacy', 'marketing'];
+        const simpleFields = ['status', 'consultType', 'name', 'phone', 'contactMethod', 'address', 'email', 'age', 'gender', 'currentJob', 'targetDate', 'expFlower', 'workTime', 'fundAvailable', 'fundTotal', 'hopeLocation', 'storeSize', 'rentBudget', 'startDate', 'availableTime', 'worry', 'requests', 'refLinks', 'privacy', 'marketing'];
         
         simpleFields.forEach(field => {
             if(formData.has(field)) data[field] = formData.get(field);
         });
 
-        // 데이터 매핑 및 처리
+        // 데이터 매핑
         data['contactTime'] = formData.getAll('contactTime');
         data['motivation'] = combineValue('motivation_opt', 'mot_other');
         data['reason'] = combineValue('reason_opt', 'rea_other');
         data['expCafe'] = combineValue('expCafe_opt', 'expCafe_other');
         data['cert'] = combineMultiValues('cert_opt', 'cert_other');
-        
-        // 2. 희망 창업 형태 (기타 처리)
         data['bizType'] = combineValue('bizType_opt', 'bt_other');
-
-        // 3. 매장 스타일 (기타 처리)
         data['storeStyle'] = combineValue('storeStyle_opt', 'ss_other');
 
         const days = document.getElementById('workDays').value;
@@ -688,8 +672,8 @@
         const tgtKw = formData.getAll('tgt_keyword').join(', ');
         data['brandConcept'] = `[${tgtGender}] [${tgtAge}] ${tgtKw}`;
 
-        // 4. 판매 희망 상품 (누락 버그 수정 완료)
-        data['products'] = formData.getAll('products').join(', ');
+        // 판매 희망 상품 (수정완료)
+        data['products'] = formData.getAll('products');
 
         data['strength'] = formData.getAll('strength');
         data['weakness'] = formData.getAll('weakness');
